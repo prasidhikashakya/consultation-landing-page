@@ -10,33 +10,13 @@ A responsive Next.js landing page and thank-you page for the free digital market
 4. The supplied logo and portrait are already included in `public/` and used by the pages.
 5. Run `npm run dev` and open `http://localhost:3000`.
 
-## Secure lead setup
+The form clearly labels development demo mode when no lead endpoint is configured. It validates details on the server but does not send or store them. A valid demo submission opens `/thank-you?demo=1`.
 
-The project has no existing Google or SMTP secrets configured. Credentials pasted into chat must be treated as exposed: revoke the posted Google service-account key and SMTP app password, then create replacements. Do not paste replacements into chat, source files, or any `NEXT_PUBLIC_*` variable.
+## Connect the production form
 
-### Google Sheets
+Configure `LEAD_SUBMISSION_URL` to a secure HTTPS endpoint you control or a form service endpoint that accepts a JSON `POST` with `fullName`, `email`, `whatsapp`, `businessName`, `website`, and `message`. The endpoint must validate and safely store/process the lead, apply its own rate limiting and spam controls, and return a `2xx` response only after it has accepted the submission. If authentication is needed, set `LEAD_SUBMISSION_TOKEN`; it is only read by the server. The app never reports a successful production submission unless this request returns `2xx`.
 
-1. Enable the Google Sheets API in the service account's Google Cloud project.
-2. Share the target spreadsheet with the service account email as an Editor.
-3. Add `GOOGLE_SHEETS_SPREADSHEET_ID` and the rotated service-account JSON as `GOOGLE_SERVICE_ACCOUNT_JSON` in Vercel. Keep the JSON in Vercel's encrypted server environment variables; do not commit a populated `.env.local`.
-4. Optionally set `GOOGLE_SHEETS_TAB_NAME` to the existing tab name. When omitted, the first tab is used.
-
-On the first accepted lead, an empty tab receives the headers, navy/cyan styling, frozen header row, filters, alternating row colors, date formatting, and column sizing. Existing data is preserved. A non-empty tab must already have the expected eleven visible headers in columns A–K; otherwise submissions fail safely instead of writing into mismatched columns. Column L is a hidden internal submission ID used to avoid duplicate rows after retries.
-
-### Email
-
-Set `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, and the rotated `SMTP_PASSWORD` in Vercel. `SMTP_FROM` defaults to `mail@prasidhikashakya.com.np`; confirm that the SMTP host authorizes this sender. `LEAD_NOTIFICATION_TO` defaults to `prasidhikashakya@gmail.com`. Vercel functions permit outbound SMTP except on port 25; messages are awaited before the successful response is returned. See [Vercel's SMTP guidance](https://vercel.com/kb/guide/serverless-functions-and-smtp).
-
-The lead is saved to Sheets first. Then the app sends a client confirmation to the submitted email and a lead notification to the configured notification address. The client confirmation result is recorded as `Pending`, `Sent`, `Failed`, or `Not configured`. Email failure never removes the saved lead. If Sheets saving fails, the form shows an error and does not redirect to the Thank You page.
-
-Set `NEXT_PUBLIC_FORM_LIVE=true` only after configuration is complete. Keep every credential server-side.
-
-### Safe verification
-
-- First configure a separate test spreadsheet tab or staging spreadsheet and an inbox you own. Do not use prospect details or send test mail to real prospects.
-- Verify the seven visible form fields, server validation, single-choice marketing need, retry behavior, the saved row/statuses, both email destinations, and the Thank You redirect.
-- Confirm a failed Sheets request leaves the visitor on the form with an error, and a mail failure leaves the row in place with `Initial Email Status` set to `Failed`.
-- After verification, set the production spreadsheet and SMTP variables in Vercel. Do not deploy or switch the live flag until you approve it.
+Set `NEXT_PUBLIC_FORM_LIVE=true` only after verifying that endpoint. In production, a missing backend does not redirect and the form reports that it is not configured. Keep credentials out of `NEXT_PUBLIC_*` variables.
 
 ## Branding, video, and deployment
 
