@@ -71,7 +71,9 @@ async function resolveSheet(
   const tab = tabName
     ? response.data.sheets?.find((item) => item.properties?.title === tabName)
     : response.data.sheets?.[0];
-  if (!tab?.properties?.sheetId || !tab.properties.title) throw new Error("LEAD_SHEET_TAB_MISSING");
+  // Google Sheets commonly assigns ID 0 to the first tab, so test for nullish
+  // values instead of treating 0 as a missing ID.
+  if (tab?.properties?.sheetId == null || !tab.properties.title) throw new Error("LEAD_SHEET_TAB_MISSING");
 
   return {
     sheetId: tab.properties.sheetId,
