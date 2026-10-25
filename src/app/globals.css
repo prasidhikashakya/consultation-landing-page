@@ -75,12 +75,11 @@ button, input, textarea { font: inherit; }
 .field { min-width: 0; }
 .field label { display: block; margin: 0 0 8px; color: #25344b; font-size: 13px; font-weight: 650; }
 .field label span { color: #d33d47; }
-.field input, .field textarea, .field select { display: block; width: 100%; min-height: 49px; padding: 12px 13px; border: 1px solid #d8e1eb; border-radius: 10px; background: #fff; color: var(--ink); font-size: 14px; line-height: 1.45; transition: border-color .15s, box-shadow .15s; }
+.field input, .field textarea { display: block; width: 100%; min-height: 49px; padding: 12px 13px; border: 1px solid #d8e1eb; border-radius: 10px; background: #fff; color: var(--ink); font-size: 14px; line-height: 1.45; transition: border-color .15s, box-shadow .15s; }
 .field textarea { min-height: 112px; resize: vertical; }
-.field select { cursor: pointer; }
 .field input::placeholder, .field textarea::placeholder { color: #94a0af; }
-.field input:focus, .field textarea:focus, .field select:focus { outline: none; border-color: var(--cyan); box-shadow: 0 0 0 3px rgba(9,157,221,.12); }
-.field input[aria-invalid="true"], .field textarea[aria-invalid="true"], .field select[aria-invalid="true"] { border-color: #c7333e; }
+.field input:focus, .field textarea:focus { outline: none; border-color: var(--cyan); box-shadow: 0 0 0 3px rgba(9,157,221,.12); }
+.field input[aria-invalid="true"] { border-color: #c7333e; }
 .form-wide { grid-column: 1 / -1; }
 .field-error, .form-error { margin: 6px 0 0; color: #b4232f; font-size: 12px; line-height: 1.5; }
 .form-error { margin: 16px 0 0; padding: 11px 13px; border-radius: 9px; background: #fff0f0; }
