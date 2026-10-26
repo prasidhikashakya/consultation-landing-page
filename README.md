@@ -25,7 +25,7 @@ On the first accepted lead, an empty tab receives the headers, navy/cyan styling
 
 ### Email
 
-Set `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, and the rotated `SMTP_PASSWORD` in Vercel. `SMTP_FROM` defaults to `mail@prasidhikashakya.com.np`; confirm that the SMTP host authorizes this sender. `LEAD_NOTIFICATION_TO` defaults to `prasidhikashakya@gmail.com`. Vercel functions permit outbound SMTP except on port 25; messages are awaited before the successful response is returned. See [Vercel's SMTP guidance](https://vercel.com/kb/guide/serverless-functions-and-smtp).
+Set `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, and a newly generated `SMTP_PASSWORD` in Vercel. For Gmail SMTP, use `smtp.gmail.com`, port `465`, the Gmail address as `SMTP_USER` (the sender defaults to this address), and a Google App Password (not your normal Google account password). `LEAD_NOTIFICATION_TO` defaults to `prasidhikashakya@gmail.com`. Optionally set `CALENDLY_URL` to your HTTPS Calendly booking URL to add a booking button to the client confirmation email. Vercel functions permit outbound SMTP except on port 25; messages are awaited before the successful response is returned. See [Vercel's SMTP guidance](https://vercel.com/kb/guide/serverless-functions-and-smtp).
 
 The lead is saved to Sheets first. Then the app sends a client confirmation to the submitted email and a lead notification to the configured notification address. The client confirmation result is recorded as `Pending`, `Sent`, `Failed`, or `Not configured`. Email failure never removes the saved lead. If Sheets saving fails, the form shows an error and does not redirect to the Thank You page.
 

@@ -14,6 +14,26 @@ export type FormState = {
 
 type LeadField = "fullName" | "email" | "whatsapp" | "businessName" | "website" | "mainMarketingNeed" | "message";
 
+const safeLeadErrorCodes = new Set([
+  "LEAD_CONFIG_MISSING",
+  "LEAD_CONFIG_INVALID",
+  "LEAD_SHEET_TAB_MISSING",
+  "LEAD_SHEET_HEADERS_MISMATCH",
+  "LEAD_ROW_NOT_CONFIRMED",
+]);
+
+function getSafeLeadDiagnostic(error: unknown): string {
+  if (error instanceof Error && safeLeadErrorCodes.has(error.message)) return error.message;
+  if (error && typeof error === "object") {
+    const details = error as { response?: { status?: unknown }; code?: unknown };
+    if (typeof details.response?.status === "number") return `GOOGLE_SHEETS_HTTP_${details.response.status}`;
+    if (typeof details.code === "string" && /^[a-z0-9_-]{1,32}$/i.test(details.code)) {
+      return `GOOGLE_SHEETS_${details.code.toUpperCase()}`;
+    }
+  }
+  return "UNKNOWN";
+}
+
 function clean(value: FormDataEntryValue | null, maxLength: number): string {
   return typeof value === "string" ? value.trim().slice(0, maxLength) : "";
 }
@@ -80,9 +100,9 @@ export async function submitConsultation(_previous: FormState, data: FormData): 
   try {
     emailConfigured = isLeadEmailConfigured();
     saved = await saveLead(lead, emailConfigured);
-  } catch {
+  } catch (error) {
     // Do not log form values, Google API responses, or credential-bearing errors.
-    console.error("[lead-submission] Google Sheets save failed.");
+    console.error(`[lead-submission] Google Sheets save failed: ${getSafeLeadDiagnostic(error)}.`);
     return {
       errors: {},
       values,
