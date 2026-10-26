@@ -34,6 +34,31 @@ function getSafeLeadDiagnostic(error: unknown): string {
   return "UNKNOWN";
 }
 
+function getLeadSaveErrorMessage(diagnostic: string): string {
+  if (diagnostic === "LEAD_CONFIG_MISSING") {
+    return "The Google Sheets connection is missing from the live site. Check the two required Sheets variables in Vercel Production.";
+  }
+  if (diagnostic === "LEAD_CONFIG_INVALID" || diagnostic === "GOOGLE_SHEETS_HTTP_401") {
+    return "Google could not authenticate the Sheets connection. Replace the service-account JSON in Vercel with a complete, valid key.";
+  }
+  if (diagnostic === "GOOGLE_SHEETS_HTTP_403") {
+    return "Google denied access to the Sheet. Check that the Sheets API is enabled and the service account has Editor access.";
+  }
+  if (diagnostic === "GOOGLE_SHEETS_HTTP_404") {
+    return "Google could not find the Sheet. Check the spreadsheet ID in Vercel.";
+  }
+  if (diagnostic === "LEAD_SHEET_TAB_MISSING") {
+    return "The configured Sheet tab was not found. Remove GOOGLE_SHEETS_TAB_NAME or set it to the exact tab label at the bottom of your Sheet.";
+  }
+  if (diagnostic === "LEAD_SHEET_HEADERS_MISMATCH") {
+    return "The selected Sheet tab already has different column headers. Choose a blank tab for consultation leads.";
+  }
+  if (diagnostic === "LEAD_ROW_NOT_CONFIRMED") {
+    return "Google did not confirm that the lead was added. Please try again, and check the Sheet before submitting again.";
+  }
+  return "We could not save your request. Please check the Google Sheets connection and try again.";
+}
+
 function clean(value: FormDataEntryValue | null, maxLength: number): string {
   return typeof value === "string" ? value.trim().slice(0, maxLength) : "";
 }
@@ -102,11 +127,12 @@ export async function submitConsultation(_previous: FormState, data: FormData): 
     saved = await saveLead(lead, emailConfigured);
   } catch (error) {
     // Do not log form values, Google API responses, or credential-bearing errors.
-    console.error(`[lead-submission] Google Sheets save failed: ${getSafeLeadDiagnostic(error)}.`);
+    const diagnostic = getSafeLeadDiagnostic(error);
+    console.error(`[lead-submission] Google Sheets save failed: ${diagnostic}.`);
     return {
       errors: {},
       values,
-      formError: "We could not save your request. Please try again in a moment.",
+      formError: getLeadSaveErrorMessage(diagnostic),
     };
   }
 
