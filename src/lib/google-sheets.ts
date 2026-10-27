@@ -159,8 +159,14 @@ async function ensureLeadSheet(
     {
       repeatCell: {
         range: { sheetId: sheet.sheetId, startRowIndex: 1, startColumnIndex: 0, endColumnIndex: 11 },
-        cell: { userEnteredFormat: { verticalAlignment: "TOP", wrapStrategy: "WRAP" } },
-        fields: "userEnteredFormat(verticalAlignment,wrapStrategy)",
+        cell: {
+          userEnteredFormat: {
+            verticalAlignment: "TOP",
+            wrapStrategy: "WRAP",
+            textFormat: { foregroundColor: sheetColor("#1F2937") },
+          },
+        },
+        fields: "userEnteredFormat(verticalAlignment,wrapStrategy,textFormat.foregroundColor)",
       },
     },
     {
